@@ -8,41 +8,35 @@ export default function ProductLayout({
 }) {
   const router = useRouter();  
   return (
-    <div className="bg-white-100 h-screen flex justify-start items-start">
-      <div className="flex w-16 flex-col  h-screen items-center space-y-10 py-2 bg-purple-200">
-
-        <div className="space-y-48 w-20 h-screen rounded-md bg-purple-700">
-          <ul>
-            {/* <li className="p-5"  onClick={() => router.push('inventory')} >
-             <img src="/Warehouse-1--Streamline-Core-Remix.svg"></img>
-            </li> */}
-             <li className="p-5">
-  <a href="/Inventory/Products">
-    <img src="/Shopping-Basket-2--Streamline-Sharp-Remix.svg" alt="Products" />
-  </a>
-</li>
-<li className="p-5">
-  <a href="/Inventory/ProductCategories">
-    <img src="/Tag--Streamline-Flex.svg" alt="Product Categories" />
-  </a>
-</li>
-<li className="p-5">
-  <a href="/Inventory/PurchaseOrder">
-    <img src="/Shopping-Cart-Download--Streamline-Ultimate.svg" alt="Purchase Order" />
-  </a>
-</li>
-<li className="p-5">
-  <a href="/Inventory//Suppliers">
-    <img src="/Business-Product-Supplier-1--Streamline-Freehand.svg" alt="Suppliers" />
-  </a>
-</li>
+    <div className="bg-gray-100 h-screen flex">
+      <div className="flex w-20 flex-col h-screen items-center space-y-6 py-4 bg-white shadow-md">
+        <div className="space-y-6 w-full px-2">
+          <ul className="flex flex-col space-y-4 w-full">
+            <li className="p-3 bg-purple-700 hover:bg-purple-500 shadow-lg rounded-lg flex justify-center items-center transition duration-300">
+              <a href="/Inventory/Products">
+                <img src="/productslogo.svg" alt="Products" className="w-8 h-8" />
+              </a>
+            </li>
+            <li className="p-3 bg-purple-700 hover:bg-purple-500 shadow-lg rounded-lg flex justify-center items-center transition duration-300">
+              <a href="/Inventory/ProductCategories">
+                <img src="/productscatogories.svg" alt="Product Categories" className="w-8 h-8" />
+              </a>
+            </li>
+            <li className="p-3 bg-purple-700 hover:bg-purple-500 shadow-lg rounded-lg flex justify-center items-center transition duration-300">
+              <a href="/Inventory/PurchaseOrder">
+                <img src="/purchaseorders.svg" alt="Purchase Order" className="w-8 h-8" />
+              </a>
+            </li>
+            <li className="p-3 bg-purple-700 hover:bg-purple-500 shadow-lg rounded-lg flex justify-center items-center transition duration-300">
+              <a href="/Inventory/Suppliers">
+                <img src="/supplier.svg" alt="Suppliers" className="w-8 h-8" />
+              </a>
+            </li>
           </ul>
-          
         </div>
       </div>
 
       <section className="flex w-full">
-        {/* Main Content Area */}
         <div className="xl:ml-50 xl:pl-0 xl:w-full xl:flex xl:flex-col mt-5 mx-2">
           {children}
         </div>

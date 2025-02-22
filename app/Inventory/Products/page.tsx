@@ -310,7 +310,7 @@ export default function ProductPage() {
       <div className="sticky top-0 overflow-hidden h-fit w-full items-center justify-between rounded-t-2xl bg-white px-4 pb-[20px] pt-4 shadow-2xl shadow-gray-100 dark:!bg-navy-700 dark:shadow-none">
         <h1 className="text-3xl font-bold text-purple-800 dark:text-white">Products</h1>
         <button
-          className="absolute top-4 right-0 linear rounded-[20px] bg-purple-400 px-4 py-2 text-base font-medium text-brand-500 transition duration-200 hover:bg-purple-500 active:bg-purple-500 dark:bg-white/5 dark:text-white dark:hover:bg-white/10 dark:active:bg-white/20"
+          className="absolute top-4 right-0 linear rounded-[20px] bg-purple-600 px-4 py-2 text-base font-medium text-white transition duration-200 hover:bg-purple-400 active:bg-purple-500 dark:bg-white/5 dark:text-white dark:hover:bg-white/10 dark:active:bg-white/20"
           onClick={() => { onOpen; setViewAddModal(true); }}
         >
           Add Product
@@ -318,8 +318,8 @@ export default function ProductPage() {
       </div>
 
       {/* Product Table */}
-      <div className="container absolute inset-25 w-full max-w-[1375px]">
-        <Table className="text-center w-full max-h-[700px]">
+      <div className="container w-full max-w-[1375px] overflow-y-auto max-h-[500px]">
+        <Table className="text-center w-full">
           <TableHeader className="sticky top-0 overflow-hidden w-full mb-4">
             <TableColumn className="p-4 w-1/6">SKU</TableColumn>
             <TableColumn className="p-4 w-1/6">Product Image</TableColumn>
@@ -387,18 +387,83 @@ export default function ProductPage() {
                 </Select>
               </div>
               <div className="relative z-0 w-full mb-5">
-                <Input type="number" label="Quantity" name="quantity" value={formValues.quantity.toString()} onChange={handleInputChange} />
+                <Input
+                  type="number"
+                  label="Quantity"
+                  name="quantity"
+                  min="0"
+                  value={formValues.quantity.toString()}
+                  onChange={(e) => {
+                    const value = Math.max(0, Number(e.target.value)); // Ensure value is not negative
+                    handleInputChange({ target: { name: "quantity", value } });
+                  }}
+                />
               </div>
+              {/*<div className="relative z-0 w-full mb-5">
+                <Input type="number" label="Quantity" name="quantity" value={formValues.quantity.toString()} onChange={handleInputChange} />
+              </div>*/}
             </div>
             <div className="flex flex-row space-x-4">
+              <div className="relative z-0 w-full mb-5">
+                <Input
+                  type="number"
+                  label="Cost"
+                  name="cost"
+                  min="0"
+                  value={formValues.cost.toString()}
+                  onChange={(e) => {
+                    const value = Math.max(0, Number(e.target.value)); // Ensure value is not negative
+                    handleInputChange({ target: { name: "cost", value } });
+                  }}
+                />
+              </div>
+              <div className="relative z-0 w-full mb-5">
+                <Input
+                  type="number"
+                  label="Price"
+                  name="price"
+                  min="0"
+                  value={formValues.price.toString()}
+                  onChange={(e) => {
+                    const value = Math.max(0, Number(e.target.value)); // Ensure value is not negative
+                    handleInputChange({ target: { name: "price", value } });
+                  }}
+                />
+              </div>
+            </div>
+
+            {/*<div className="flex flex-row space-x-4">
               <div className="relative z-0 w-full mb-5">
                 <Input type="number" label="Cost" name="cost" value={formValues.cost.toString()} onChange={handleInputChange} />
               </div>
               <div className="relative z-0 w-full mb-5">
                 <Input type="number" label="Price" name="price" value={formValues.price.toString()} onChange={handleInputChange} />
               </div>
-            </div>
+            </div>*/}
+
             <div className="flex flex-row space-x-4">
+              <div className="relative z-0 w-full mb-5">
+                <Switch color="secondary" checked={showMaxDiscount} onChange={() => setShowMaxDiscount((prev) => !prev)}>
+                  Max Discount
+                </Switch>
+              </div>
+              <div className="relative z-0 w-full mb-5">
+                {showMaxDiscount && (
+                  <Input
+                    type="number"
+                    label="Max Discount"
+                    name="maxDiscount"
+                    value={formValues.maxDiscount.toString()}
+                    onChange={(e) => {
+                      const value = Math.max(0, Number(e.target.value)); // Prevent negative values
+                      handleInputChange({ target: { name: "maxDiscount", value } });
+                    }}
+                  />
+                )}
+              </div>
+            </div>
+
+            {/*<div className="flex flex-row space-x-4">
               <div className="relative z-0 w-full mb-5">
                 <Switch color="secondary" checked={showMaxDiscount} onChange={() => setShowMaxDiscount((prev) => !prev)}>
                   Max Discount
@@ -407,13 +472,25 @@ export default function ProductPage() {
               <div className="relative z-0 w-full mb-5">
                 {showMaxDiscount && <Input type="number" label="Max Discount" name="maxDiscount" value={formValues.maxDiscount.toString()} onChange={handleInputChange} />}
               </div>
-            </div>
-            <Input type="file" onChange={handleFileChange} />
+            </div>*/}
+
+            <label className="cursor-pointer bg-purple-600 hover:bg-purple-500 text-white font-medium px-4 py-2 rounded-md transition">
+              Choose File
+              <Input type="file" className="hidden" onChange={handleFileChange} />
+            </label>
+
+            {/*<label className="cursor-pointer bg-gray-200 px-4 py-2 rounded-md">
+              Choose File
+              <Input type="file" className="hidden" onChange={handleFileChange} />
+            </label>*}
+
+            {/*<Input type="file" onChange={handleFileChange} />*/}
+
             {imagePreview && <Image src={imagePreview} alt="Preview" />}
           </ModalBody>
           <ModalFooter>
-            <Button onClick={handleAddProduct}>Save</Button>
-            <Button color="secondary" onClick={() => setViewAddModal(false)}>Cancel</Button>
+            <Button onClick={() => setViewAddModal(false)} className="bg-white text-black border border-black">Cancel</Button>
+            <Button onClick={handleAddProduct} className="bg-purple-700 text-white">Save</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

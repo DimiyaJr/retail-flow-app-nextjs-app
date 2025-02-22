@@ -47,23 +47,6 @@ export default function ProductCategoriesPage() {
     }
   };
 
-  const handleDeleteConfirm = (product: ProductCategory) => {
-    setSelectedProductCategoryId(product.id);
-    setViewDelete(true);
-  };
-
-  const handleDeleteProceed = async () => {
-    try {
-      await axios.delete(API_ENPOINTS.DELETE_PRODUCT_CATEGORY, {
-        params: { id: selectedProductCategoryId },
-      });
-      setViewDelete(false);
-      loadProductCategories();
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   const handleAddProductCategory = async () => {
     if (!categoryName.trim()) return alert("Category name cannot be empty!");
     try {
@@ -98,151 +81,122 @@ export default function ProductCategoriesPage() {
     }
   };
 
+  const handleDeleteConfirm = (id: string) => {
+    setSelectedProductCategoryId(id);
+    setViewDelete(true);
+  };
+
+  const handleDeleteProceed = async () => {
+    try {
+      await axios.delete(API_ENPOINTS.DELETE_PRODUCT_CATEGORY, {
+        params: { id: selectedProductCategoryId },
+      });
+      setViewDelete(false);
+      loadProductCategories();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     loadProductCategories();
   }, []);
-
-  const rows = productCategoryList.map((product) => (
-    <TableRow key={product.id}>
-      <TableCell style={{textAlign: "center" }} >{product.Category}</TableCell>
-      <TableCell style={{textAlign: "center" }} >
-        {product.Status === 1 ? (
-          <Badge color="primary">Active</Badge>
-        ) : (
-          <Badge color="danger">Inactive</Badge>
-        )}
-      </TableCell>
-      <TableCell style={{ display: "flex", gap: "5px", justifyContent: "center" }}>
-        {/* <Button onClick={() => handleEditProductCategory(product.id)}>
-          <IconEdit />
-        </Button>
-        <Button color="danger" onClick={() => handleDeleteConfirm(product)}>
-          <IconTrashX />
-        </Button> */}
-        
-        <div className="grid gap-4 grid-cols-2">
-              <Button onClick={() => handleEditProductCategory(product.id)} title="Edit Product" className="flex flex-wrap gap-1 items-center">
-            <IconEdit />
-          </Button>
-          <Button color="secondary" onClick={() => handleDeleteConfirm(product)} title="Delete Product" className="flex flex-wrap gap-1 items-center">
-            <IconTrashX />
-          </Button>
-          </div>
-      </TableCell>
-    </TableRow>
-  ));
 
   return (
     <>
       {/* Delete Confirmation Modal */}
       <Modal isOpen={viewDelete} onClose={() => setViewDelete(false)}>
-      <ModalContent>
-        <ModalHeader>
-          <h3>Delete Product Category</h3>
-        </ModalHeader>
-        <ModalBody>
-          <p>Are you sure you want to delete this product category?</p>
-        </ModalBody>
-        <ModalFooter>
-          <Button color="danger" onClick={handleDeleteProceed}>
-            Delete
-          </Button>
-          <Button onClick={() => setViewDelete(false)}>Close</Button>
-        </ModalFooter>
+        <ModalContent>
+          <ModalHeader>Delete Product Category</ModalHeader>
+          <ModalBody>
+            <p>Are you sure you want to delete this product category?</p>
+          </ModalBody>
+          <ModalFooter>
+            <Button color="danger" onClick={handleDeleteProceed}>Delete</Button>
+            <Button onClick={() => setViewDelete(false)}>Close</Button>
+          </ModalFooter>
         </ModalContent>
       </Modal>
 
       {/* Add Product Category Modal */}
       <Modal isOpen={viewAddItem} onClose={() => setViewAddItem(false)}>
         <ModalContent>
-        <ModalHeader>
-          <h3>Add New Product Category</h3>
-        </ModalHeader>
-        <ModalBody>
-          <Input
-            required
-            fullWidth
-            label="Category Name"
-            placeholder="Electronics"
-            value={categoryName}
-            onChange={(e) => setCategoryName(e.target.value)}
-          />
-        </ModalBody>
-        <ModalFooter>
-          <Button onClick={handleAddProductCategory}>Create</Button>
-          <Button onClick={() => setViewAddItem(false)}>Close</Button>
-        </ModalFooter>
+          <ModalHeader>Add New Product Category</ModalHeader>
+          <ModalBody>
+            <Input
+              fullWidth
+              label="Category Name"
+              placeholder="Electronics"
+              value={categoryName}
+              onChange={(e) => setCategoryName(e.target.value)}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={handleAddProductCategory}>Create</Button>
+            <Button onClick={() => setViewAddItem(false)}>Close</Button>
+          </ModalFooter>
         </ModalContent>
       </Modal>
 
       {/* Edit Product Category Modal */}
       <Modal isOpen={viewEditItem} onClose={() => setViewEditItem(false)}>
-      <ModalContent>
-        <ModalHeader>
-          <h3>Edit Product Category</h3>
-        </ModalHeader>
-        <ModalBody>
-          <Input
-            required
-            fullWidth
-            label="Category Name"
-            placeholder="Electronics"
-            value={categoryName}
-            onChange={(e) => setCategoryName(e.target.value)}
-          />
-        </ModalBody>
-        <ModalFooter>
-          <Button onClick={handleUpdateProductCategory}>Update</Button>
-          <Button onClick={() => {setViewEditItem(false);
-            setCategoryName('');}
-          }>Close</Button>
-        </ModalFooter>
+        <ModalContent>
+          <ModalHeader>Edit Product Category</ModalHeader>
+          <ModalBody>
+            <Input
+              fullWidth
+              label="Category Name"
+              placeholder="Electronics"
+              value={categoryName}
+              onChange={(e) => setCategoryName(e.target.value)}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={handleUpdateProductCategory}>Update</Button>
+            <Button onClick={() => setViewEditItem(false)}>Close</Button>
+          </ModalFooter>
         </ModalContent>
       </Modal>
 
       {/* Main View */}
       <div>
-        {/* <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <h4>Product Categories</h4>
-          <Button onClick={() => setViewAddItem(true)} icon={<IconSquareRoundedPlus />}>
-            Add
-          </Button>
-        </div> */}
-
-<div
-                className="sticky top-0 overflow-hidden h-fit w-full items-center justify-between rounded-t-2xl bg-white px-4 pb-[20px] pt-4 shadow-2xl shadow-gray-100 dark:!bg-navy-700 dark:shadow-none"
-                >
-                <h1 className="text-3xl font-bold text-purple-800 dark:text-white">
-                Product Categories
-                </h1>
-                <button
-                    className=" absolute top-4 right-0 linear rounded-[20px] bg-purple-400 px-4 py-2 text-base font-medium text-brand-500 transition duration-200  hover:bg-purple-500 active:bg-purple-500 dark:bg-white/5 dark:text-white dark:hover:bg-white/10 dark:active:bg-white/20"
-                    onClick={() => { open;
-                      console.log("Opening Add Product Modal");
-                      setViewAddItem(true);
-                    }}
-               
-               >
-                    Add Product Categories
-                </button>
-                </div>
-        <Spacer y={1} />
-        <div>
-          <Table
-            aria-label="Product Categories Table"
-            style={{
-              height: "auto",
-              minWidth: "100%",
-            }}
+        <div className="sticky top-0 bg-white px-4 pb-4 pt-4 shadow-xl rounded-t-2xl flex justify-between items-center">
+          <h1 className="text-3xl font-bold text-purple-800">Product Categories</h1>
+          <button
+            className="absolute top-4 right-0 linear rounded-[20px] bg-purple-600 px-4 py-2 text-base font-medium text-white transition duration-200 hover:bg-purple-400 active:bg-purple-500 dark:bg-white/5 dark:text-white dark:hover:bg-white/10 dark:active:bg-white/20"
+            onClick={() => setViewAddItem(true)}
           >
+            Add Product Categories
+          </button>
+        </div>
+        <Spacer y={1} />
+        <div style={{ maxHeight: "400px", overflowY: "auto", border: "1px solid #ddd", borderRadius: "8px" }}>
+          <Table>
             <TableHeader>
-              <TableColumn style={{textAlign: "center" }}>
-                Product Category
-              </TableColumn>
-              <TableColumn style={{textAlign: "center" }}>Status</TableColumn>
-              <TableColumn children={undefined} />
+              <TableColumn>Product Category</TableColumn>
+              <TableColumn>Status</TableColumn>
+              <TableColumn>Actions</TableColumn>
             </TableHeader>
-            <TableBody className="overflow-y-auto" >{rows}</TableBody>
+            <TableBody>
+              {productCategoryList.map((product) => (
+                <TableRow key={product.id}>
+                  <TableCell>{product.Category}</TableCell>
+                  <TableCell>
+                    <Badge color={product.Status === 1 ? "primary" : "danger"}>
+                      {product.Status === 1 ? "Active" : "Inactive"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="flex gap-2 justify-center">
+                    <Button onClick={() => handleEditProductCategory(product.id)}>
+                      <IconEdit />
+                    </Button>
+                    <Button color="secondary" onClick={() => handleDeleteConfirm(product.id)}>
+                      <IconTrashX />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
           </Table>
         </div>
       </div>
