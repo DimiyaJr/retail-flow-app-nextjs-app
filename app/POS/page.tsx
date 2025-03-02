@@ -49,6 +49,7 @@ interface Product {
   quantity?: number;
   discount?: number;
   sku?: string;
+  isFree?: boolean; 
 }
 
 interface Customer {
@@ -91,70 +92,127 @@ export default function POSPage() {
   let formatter = useDateFormatter({dateStyle: "full"});
 
   const handleAddToCart = () => {
-
-
     if (!selectedProduct) {
       alert("Please select a product.");
       return;
     }
-
-    const existingProduct = cart.find((item) => item.id === selectedProduct.id);
-
-    if (discount > maxDiscount){
-
-      alert(`Discount cannot exceed LKR ${maxDiscount}%`  );
+  
+    const existingProduct = cart.find((item) => item.sku === selectedProduct.sku);
+  
+    if (discount > maxDiscount) {
+      alert(`Discount cannot exceed LKR ${maxDiscount}%`);
       setDiscount(0);
       return;
     }
-
+  
     if (quantity > maxQty) {
       alert(`Quantity cannot exceed ${maxQty}`);
       setQuantity(0);
     }
-
-
+  
     const totalQuantity = existingProduct
-    ? (existingProduct.quantity ?? 0) + quantity
-    : quantity;
-    console.log(totalQuantity)
-
+      ? (existingProduct.quantity ?? 0) + quantity
+      : quantity;
+  
     if (totalQuantity > maxQty) {
       alert(`Cannot add more than ${maxQty} of ${selectedProduct.productName}`);
       return;
     }
-
-    setCart((prev) => {
-      if (existingProduct) {
-        return prev.map((item) =>
-          item.id === selectedProduct.id
-            ? { ...item, quantity:(item.quantity ?? 0) + quantity }
-            : item
-        );
-      } else {
-        return [...prev, { ...selectedProduct, quantity, discount }];
+  
+    if (!productName || quantity <= 0) return;
+  
+    const newCart = [...cart];
+    const itemIndex = newCart.findIndex((item) => item.sku === selectedProduct.sku);
+  
+    // If the product already exists in the cart, update its quantity
+    if (itemIndex > -1) {
+      const item = newCart[itemIndex];
+      if (item) {
+        item.quantity = (item.quantity ?? 0) + quantity; // Ensure quantity is not undefined
       }
-    });
-
+    } else {
+      // Add new product to cart
+      newCart.push({
+        sku: selectedProduct.sku,
+        productName,
+        quantity,
+        price: selectedProduct.price,
+        discount,
+        // 'isFree' is added here but will need type assertion if 'Product' type does not have it
+      } as Product & { isFree?: boolean });
+    }
+  
+    // Check if DHP qualifies for free items
+    if (productName === "DHP" && quantity >= 50) {
+      const freeDHP = Math.floor(quantity / 50) * 10;
+      const totalDHP = quantity + freeDHP;
+      const freeLepto = totalDHP;
+  
+      // Add free DHP
+      newCart.push({
+        sku: "DHP_FREE",
+        productName: "DHP (Free)",
+        quantity: freeDHP,
+        price: 0,
+        discount: 100,
+        isFree: true, // Add 'isFree' here
+      } as Product & { isFree: boolean });
+  
+      // Add free Lepto
+      newCart.push({
+        sku: "LEPTO_FREE",
+        productName: "Lepto (Free)",
+        quantity: freeLepto,
+        price: 0,
+        discount: 100,
+        isFree: true, // Add 'isFree' here
+      } as Product & { isFree: boolean });
+    }
+  
+    setCart(newCart);
     setQuantity(0);
     setSelectedProduct(null);
     setProductName("");
     setSKU("");
     setDiscount(0);
   };
+  
+  
 
   const handleRemoveFromCart = (index: number) => {
     setCart((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleCheckout = async () => {
-    const isConfirmed = window.confirm("Are you sure you want to proceed with checkout?");
+  // Example of a mock function for inventory update
+const updateInventory = async (items: Product[]) => {
+  // Placeholder for actual inventory update logic.
+  console.log("Updating inventory with the following items:", items);
+  // Simulate a delay for inventory update (e.g., network request)
+  return new Promise((resolve) => setTimeout(resolve, 1000));
+};
+
+const handleCheckout = async () => {
+  const isConfirmed = window.confirm("Are you sure you want to proceed with checkout?");
+  
   if (isConfirmed) {
-    // setCheckoutModalOpen(true);
-    handleConfirmCheckout();
-    
+    // Filter out free items (those with isFree: true) from the cart
+    const regularItems = cart.filter((item) => !item.isFree);
+
+    try {
+      // Call the updateInventory function with the filtered items (excluding free items)
+      await updateInventory(regularItems);
+
+      // Proceed with confirming checkout, show the invoice modal, or finalize the order
+      handleConfirmCheckout();  // Continue with your confirmation flow
+      setCheckoutModalOpen(true); // Show the invoice modal (if needed)
+      
+    } catch (error) {
+      alert('Failed to update inventory. Please try again.');
+    }
   }
-    
-  };
+};
+
+  
   
   const handleCheckoutClose = () => {
     
@@ -276,12 +334,13 @@ export default function POSPage() {
     )
     .toFixed(2);
   
-  // Convert netTotal and cartTotal to numbers for calculation
-  const Totaldiscount = parseFloat(netTotal) - parseFloat(cartTotal);
-  
-  console.log(`Net Total: $${netTotal}`);
-  console.log(`Cart Total: $${cartTotal}`);
-  console.log(`Discount: $${discount.toFixed(2)}`);
+  // Convert netTotal and cartTotal to numbers for accurate calculations
+  const Totaldiscount = (parseFloat(netTotal) - parseFloat(cartTotal)).toFixed(2);
+
+  console.log(`Net Total: LKR ${netTotal}`);
+  console.log(`Cart Total: LKR ${cartTotal}`);
+  console.log(`Total Discount: LKR ${Totaldiscount}`);
+
 
   const loadProducts = async () => {
     try {
@@ -466,17 +525,20 @@ export default function POSPage() {
 
   
   const renderInvoiceTemplate = () => {
-    const rows = cart.map(
-      (item) =>
-        `<tr>
-          <td>${item.quantity}</td>
-          <td>${item.productName}</td>
-          <td>${item.discount}%</td>
-          <td>${item.price.toFixed(2)}</td>
-          <td>${(calculateDiscountedPrice(item.price, item.discount || 0) * (item.quantity || 0)).toFixed(2)}</td>
-        </tr>`
-    );
-
+    const rows = cart.map((item) => {
+      // Type assertion for item to include isFree field
+      const itemWithFree = item as Product & { isFree?: boolean };
+    
+      return `
+        <tr ${itemWithFree.isFree ? 'style="color: green; font-weight: bold;"' : ""}>
+          <td>${itemWithFree.quantity}</td>
+          <td>${itemWithFree.productName}</td>
+          <td>${itemWithFree.isFree ? "Free" : itemWithFree.discount + "%"}</td>
+          <td>${itemWithFree.isFree ? "0.00" : itemWithFree.price.toFixed(2)}</td>
+          <td>${itemWithFree.isFree ? "0.00" : (calculateDiscountedPrice(itemWithFree.price, itemWithFree.discount || 0) * (itemWithFree.quantity || 0)).toFixed(2)}</td>
+        </tr>
+      `;
+    });
     
 
     return `
