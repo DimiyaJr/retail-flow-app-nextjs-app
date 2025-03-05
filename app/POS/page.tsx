@@ -40,7 +40,7 @@ import {getLocalTimeZone, today} from "@internationalized/date";
 import {useDateFormatter} from "@react-aria/i18n";
 import { NextApiRequest, NextApiResponse } from 'next';
 import puppeteer from 'puppeteer';
-
+import { CalendarDate } from "@internationalized/date";
 
 interface Product {
   id: number;
@@ -972,7 +972,7 @@ const handleCheckout = async () => {
                     </AutocompleteItem>
                   ))}
                 </Autocomplete>
-  
+
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div className="flex flex-col">
                     <h5>Customer Name</h5>
@@ -984,13 +984,22 @@ const handleCheckout = async () => {
                   </div>
                   <div className="flex flex-col">
                     <h5>Post Date</h5>
-                    <DatePicker value={postDate} onChange={setPostDate} label="Select date" />
+                    <DatePicker
+                      value={postDate}
+                      onChange={(date: CalendarDate | null) => date && setPostDate(date)}
+                      label="Select date"
+                    />
                   </div>
                   <div className="flex flex-col">
                     <h5>Due Date</h5>
-                    <DatePicker value={dueDate} onChange={setDueDate} label="Select date" />
+                    <DatePicker
+                      value={dueDate}
+                      onChange={(date: CalendarDate | null) => date && setDueDate(date)}
+                      label="Select date"
+                    />
                   </div>
                 </div>
+
               </Card>
   
               {/* Product and Cart Section */}
