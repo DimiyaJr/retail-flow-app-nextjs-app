@@ -144,7 +144,7 @@ export default function PurchaseOrderPage() {
     console.log(selectedProduct)
     console.log(productQuantity)
     console.log(productCost)
-    if (selectedProduct && productQuantity > 0) {
+    if (selectedProduct && (productQuantity ?? 0) > 0) {
       const newEntry = {
         ...selectedProduct,
         po_id: productCounter,
@@ -356,9 +356,10 @@ export default function PurchaseOrderPage() {
             <Input
               label="Quantity"
               type="number"
-              value={productQuantity?.toString() || ""}
-              onChange={(e) => setProductQuantity(Number(e.target.value))}
+              value={productQuantity !== undefined ? productQuantity.toString() : "0"}
+              onChange={(e) => setProductQuantity(Number(e.target.value) || 0)}
             />
+
 
             <Input
               label="Cost"
