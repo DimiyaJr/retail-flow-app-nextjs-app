@@ -93,91 +93,228 @@ export default function POSPage() {
 
   const handleAddToCart = () => {
     if (!selectedProduct) {
-      alert("Please select a product.");
-      return;
+        alert("Please select a product.");
+        return;
     }
-  
+
     const existingProduct = cart.find((item) => item.sku === selectedProduct.sku);
-  
+
     if (discount > maxDiscount) {
-      alert(`Discount cannot exceed LKR ${maxDiscount}%`);
-      setDiscount(0);
-      return;
+        alert(`Discount cannot exceed LKR ${maxDiscount}%`);
+        setDiscount(0);
+        return;
     }
-  
+
     if (quantity > maxQty) {
-      alert(`Quantity cannot exceed ${maxQty}`);
-      setQuantity(0);
+        alert(`Quantity cannot exceed ${maxQty}`);
+        setQuantity(0);
+        return;
     }
-  
+
     const totalQuantity = existingProduct
-      ? (existingProduct.quantity ?? 0) + quantity
-      : quantity;
-  
+        ? (existingProduct.quantity ?? 0) + quantity
+        : quantity;
+
     if (totalQuantity > maxQty) {
-      alert(`Cannot add more than ${maxQty} of ${selectedProduct.productName}`);
-      return;
+        alert(`Cannot add more than ${maxQty} of ${selectedProduct.productName}`);
+        return;
     }
-  
+
     if (!productName || quantity <= 0) return;
-  
+
     const newCart = [...cart];
     const itemIndex = newCart.findIndex((item) => item.sku === selectedProduct.sku);
-  
-    // If the product already exists in the cart, update its quantity
+
     if (itemIndex > -1) {
-      const item = newCart[itemIndex];
-      if (item) {
-        item.quantity = (item.quantity ?? 0) + quantity; // Ensure quantity is not undefined
-      }
+        const item = newCart[itemIndex];
+        if (item) {
+            item.quantity = (item.quantity ?? 0) + quantity;
+        }
     } else {
-      // Add new product to cart
-      newCart.push({
-        sku: selectedProduct.sku,
-        productName,
-        quantity,
-        price: selectedProduct.price,
-        discount,
-        // 'isFree' is added here but will need type assertion if 'Product' type does not have it
-      } as Product & { isFree?: boolean });
+        newCart.push({
+            sku: selectedProduct.sku,
+            productName,
+            quantity,
+            price: selectedProduct.price,
+            discount,
+        } as Product & { isFree?: boolean });
     }
-  
-    // Check if DHP qualifies for free items
-    if (productName === "DHP" && quantity >= 50) {
-      const freeDHP = Math.floor(quantity / 50) * 10;
-      const totalDHP = quantity + freeDHP;
-      const freeLepto = totalDHP;
-  
-      // Add free DHP
-      newCart.push({
-        sku: "DHP_FREE",
-        productName: "DHP (Free)",
-        quantity: freeDHP,
-        price: 0,
-        discount: 100,
-        isFree: true, // Add 'isFree' here
-      } as Product & { isFree: boolean });
-  
-      // Add free Lepto
-      newCart.push({
-        sku: "LEPTO_FREE",
-        productName: "Lepto (Free)",
-        quantity: freeLepto,
-        price: 0,
-        discount: 100,
-        isFree: true, // Add 'isFree' here
-      } as Product & { isFree: boolean });
+
+    // **DHP Free Product Conditions**
+    if (productName === "DHP") {
+        let freeDHP = 0;
+        let freeLepto = 0;
+
+        if (quantity >= 200) {
+            freeDHP = 50;
+            freeLepto = 250;
+        } else if (quantity >= 150) {
+            freeDHP = 35;
+            freeLepto = 185;
+        } else if (quantity >= 100) {
+            freeDHP = 25;
+            freeLepto = 125;
+        } else if (quantity >= 50) {
+            freeDHP = 12;
+            freeLepto = 62;
+        }
+
+        if (freeDHP > 0) {
+            newCart.push({
+                sku: "DHP_FREE",
+                productName: "DHP (Free)",
+                quantity: freeDHP,
+                price: 0,
+                discount: 100,
+                isFree: true,
+            } as Product & { isFree: boolean });
+
+            newCart.push({
+                sku: "LEPTO_FREE",
+                productName: "Lepto (Free)",
+                quantity: freeLepto,
+                price: 0,
+                discount: 100,
+                isFree: true,
+            } as Product & { isFree: boolean });
+        }
     }
-  
+
+    // **Tri Cat Free Product Conditions (Updated)**
+    if (productName === "Tri Cat") {
+        let freeTriCat = 0;
+
+        if (quantity >= 300) freeTriCat = 30;
+        else if (quantity >= 200) freeTriCat = 20;
+        else if (quantity >= 100) freeTriCat = 10;
+        else if (quantity >= 10) freeTriCat = 1;
+
+        if (freeTriCat > 0) {
+            newCart.push({
+                sku: "TRI_CAT_FREE",
+                productName: "Tri Cat (Free)",
+                quantity: freeTriCat,
+                price: 0,
+                discount: 100,
+                isFree: true,
+            } as Product & { isFree: boolean });
+        }
+    }
+
+    // **Beranil Free Product Conditions**
+    if (productName === "Beranil") {
+        let freeBeranil = 0;
+        if (quantity >= 100) freeBeranil = 10;
+        else if (quantity >= 10) freeBeranil = 1;
+
+        if (freeBeranil > 0) {
+            newCart.push({
+                sku: "BERANIL_FREE",
+                productName: "Beranil (Free)",
+                quantity: freeBeranil,
+                price: 0,
+                discount: 100,
+                isFree: true,
+            } as Product & { isFree: boolean });
+        }
+    }
+
+    // **Avilin Free Product Conditions**
+    if (productName === "Avilin") {
+        let freeAvilin = 0;
+        if (quantity >= 100) freeAvilin = 10;
+        else if (quantity >= 10) freeAvilin = 1;
+
+        if (freeAvilin > 0) {
+            newCart.push({
+                sku: "AVILIN_FREE",
+                productName: "Avilin (Free)",
+                quantity: freeAvilin,
+                price: 0,
+                discount: 100,
+                isFree: true,
+            } as Product & { isFree: boolean });
+        }
+    }
+
+    // **Prednisolone Free Product Conditions**
+    if (productName === "Prednisolone") {
+        let freePrednisolone = 0;
+        if (quantity >= 100) freePrednisolone = 10;
+        else if (quantity >= 10) freePrednisolone = 1;
+
+        if (freePrednisolone > 0) {
+            newCart.push({
+                sku: "PREDNISOLONE_FREE",
+                productName: "Prednisolone (Free)",
+                quantity: freePrednisolone,
+                price: 0,
+                discount: 100,
+                isFree: true,
+            } as Product & { isFree: boolean });
+        }
+    }
+
+    // **Parvo Free Product Conditions**
+    if (productName === "Parvo") {
+        let freeParvo = 0;
+        let freeDilund = 0;
+
+        if (quantity >= 200) {
+            freeParvo = 50;
+            freeDilund = 250;
+        } else if (quantity >= 150) {
+            freeParvo = 35;
+            freeDilund = 185;
+        } else if (quantity >= 100) {
+            freeParvo = 25;
+            freeDilund = 125;
+        } else if (quantity >= 50) {
+            freeParvo = 12;
+            freeDilund = 62;
+        }
+
+        if (freeParvo > 0) {
+            newCart.push({
+                sku: "PARVO_FREE",
+                productName: "Parvo (Free)",
+                quantity: freeParvo,
+                price: 0,
+                discount: 100,
+                isFree: true,
+            } as Product & { isFree: boolean });
+
+            newCart.push({
+                sku: "DILUND_FREE",
+                productName: "Dilund (Free)",
+                quantity: freeDilund,
+                price: 0,
+                discount: 100,
+                isFree: true,
+            } as Product & { isFree: boolean });
+        }
+    }
+
+    // **Puppy DP Free Product Conditions**
+    if (productName === "Puppy DP") {
+        newCart.push({
+            sku: "DILUND_FREE",
+            productName: "Dilund (Free)",
+            quantity: quantity, // Same count as Puppy DP
+            price: 0,
+            discount: 100,
+            isFree: true,
+        } as Product & { isFree: boolean });
+    }
+
     setCart(newCart);
     setQuantity(0);
     setSelectedProduct(null);
     setProductName("");
     setSKU("");
     setDiscount(0);
-  };
-  
-  
+};
+
 
   const handleRemoveFromCart = (index: number) => {
     setCart((prev) => prev.filter((_, i) => i !== index));

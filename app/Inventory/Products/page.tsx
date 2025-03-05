@@ -395,7 +395,8 @@ export default function ProductPage() {
                   value={formValues.quantity.toString()}
                   onChange={(e) => {
                     const value = Math.max(0, Number(e.target.value)); // Ensure value is not negative
-                    handleInputChange({ target: { name: "quantity", value } });
+                    e.target.value = String(value); // Convert number to string
+                    handleInputChange(e); // Pass the event directly
                   }}
                 />
               </div>
@@ -413,10 +414,12 @@ export default function ProductPage() {
                   value={formValues.cost.toString()}
                   onChange={(e) => {
                     const value = Math.max(0, Number(e.target.value)); // Ensure value is not negative
-                    handleInputChange({ target: { name: "cost", value } });
+                    e.target.value = String(value); // Convert number to string
+                    handleInputChange(e); // Pass the event directly
                   }}
                 />
               </div>
+
               <div className="relative z-0 w-full mb-5">
                 <Input
                   type="number"
@@ -426,7 +429,8 @@ export default function ProductPage() {
                   value={formValues.price.toString()}
                   onChange={(e) => {
                     const value = Math.max(0, Number(e.target.value)); // Ensure value is not negative
-                    handleInputChange({ target: { name: "price", value } });
+                    e.target.value = String(value); // Convert number to string
+                    handleInputChange(e); // Pass the event directly
                   }}
                 />
               </div>
@@ -453,10 +457,12 @@ export default function ProductPage() {
                     type="number"
                     label="Max Discount"
                     name="maxDiscount"
+                    min="0"
                     value={formValues.maxDiscount.toString()}
                     onChange={(e) => {
                       const value = Math.max(0, Number(e.target.value)); // Prevent negative values
-                      handleInputChange({ target: { name: "maxDiscount", value } });
+                      e.target.value = String(value); // Convert number to string
+                      handleInputChange(e); // Pass the event directly
                     }}
                   />
                 )}
