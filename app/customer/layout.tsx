@@ -4,11 +4,11 @@ export default function CustomerLayout({
   children: React.ReactNode;
 }) {
   return (
-    <section className="flex w-full">
-    {/* Main Content Area */}
-    <div className="xl:ml-50 xl:pl-0 xl:w-full xl:flex xl:flex-col mt-5 mx-2">
-      {children}
-    </div>
-  </section>
+    <section className="flex w-full px-4 md:px-6">
+      {/* Main Content Area */}
+      <div className="w-full flex flex-col mt-5">
+        {children}
+      </div>
+    </section>
   );
 }

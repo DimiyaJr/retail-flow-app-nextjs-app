@@ -1,5 +1,5 @@
 
-const BASE_URL = "https://backend.inventory.quamputon.com";
+const BASE_URL = "http://localhost:3001";
 const API_ENPOINTS =  {
     LOGIN: `${BASE_URL}/api/login`,
     GET_PRODUCT_CATEGORIES: `${BASE_URL}/api/get-product-categories`,
