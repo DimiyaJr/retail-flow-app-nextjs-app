@@ -12,7 +12,8 @@ export default function AuthPage() {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
-      const response = await axios.post("http://localhost:3001/api/login", {
+      //http://localhost:3001/api/login
+      const response = await axios.post("http://testbackendinventoryv2.quamputon.com/api/login", {
         username,
         password,
       });

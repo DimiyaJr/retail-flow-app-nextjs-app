@@ -1,5 +1,6 @@
 
-const BASE_URL = "http://localhost:3001";
+//const BASE_URL = "http://localhost:3001";
+const BASE_URL = "http://testbackendinventoryv2.quamputon.com";
 const API_ENPOINTS =  {
     LOGIN: `${BASE_URL}/api/login`,
     GET_PRODUCT_CATEGORIES: `${BASE_URL}/api/get-product-categories`,
